@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/remarkable-story/remarkable-story-backend#readme",
   "dependencies": {
+    "dotenv": "^6.2.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
@@ -32,7 +33,6 @@
     "sqlite3": "^4.0.6"
   },
   "devDependencies": {
-    "dotenv": "^6.2.0",
     "jest": "^24.0.0",
     "nodemon": "^1.18.9",
     "supertest": "^3.4.2"
