@@ -94,7 +94,10 @@ function addStory(req, res) {
   db("stories")
     .insert(story)
     .then(response => {
-      res.status(201).send(`Your story has been submitted`);
+      db('stories')
+      .then(stories => {
+        res.status(201).send(stories);
+      })
     })
     .catch(() =>
       res.status(500).send({ error: "error saving story to database." })
