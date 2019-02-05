@@ -10,10 +10,10 @@ module.exports = server => {
   server.post("/api/login", login);
   server.get("/api/stories", getStories);
   server.get("/api/stories/:id", getStory);
-  server.post("/api/stories", authenticate, addStory);
-  server.delete("/api/stories/:id", authenticate, deleteStory);
-  server.put("/api/stories/:id", authenticate, editStory);
-  server.get('/mystories/:id', authenticate, usersStories)
+  server.post("/api/stories",  addStory);
+  server.delete("/api/stories/:id", deleteStory);
+  server.put("/api/stories/:id", editStory);
+  server.get("/mystories/:id", usersStories);
 };
 
 function generateToken(user) {
@@ -29,13 +29,22 @@ function register(req, res) {
   const userInfo = req.body;
   const hash = bcrypt.hashSync(userInfo.password, 14);
   userInfo.password = hash;
-
-  db("users")
-    .insert(userInfo)
-    .then(user => {
-      res.status(201).send(`Thank you for registering. Your ID is ${user}`);
-    })
-    .catch(() => res.status(500).send(`error registering`));
+  if (
+    req.body.username == null ||
+    req.body.title == null ||
+    req.body.country === null ||
+    req.body.email === null ||
+    req.body.password === null
+  ) {
+    res.status(422).send({ error: "information incomplete " });
+  } else {
+    db("users")
+      .insert(userInfo)
+      .then(user => {
+        res.status(201).send(`Thank you for registering. Your ID is ${user}`);
+      })
+      .catch(() => res.status(500).send(`error registering`));
+  }
 }
 
 function login(req, res) {
@@ -114,10 +123,12 @@ function editStory(req, res) {
 }
 
 function usersStories(req, res) {
-    db('stories')
+  db("stories")
     .where({ user_id: req.params.id })
     .then(stories => {
-        res.status(200).send(stories)
+      res.status(200).send(stories);
     })
-    .catch(() => res.status(500).send(`couldn't retrieve stories from database`))
+    .catch(() =>
+      res.status(500).send(`couldn't retrieve stories from database`)
+    );
 }
