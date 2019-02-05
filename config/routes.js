@@ -10,10 +10,10 @@ module.exports = server => {
   server.post("/api/login", login);
   server.get("/api/stories", getStories);
   server.get("/api/stories/:id", getStory);
-  server.post("/api/stories",  addStory);
-  server.delete("/api/stories/:id", deleteStory);
-  server.put("/api/stories/:id", editStory);
-  server.get("/mystories/:id", usersStories);
+  server.post("/api/stories", authenticate,  addStory);
+  server.delete("/api/stories/:id", authenticate, deleteStory);
+  server.put("/api/stories/:id", authenticate, editStory);
+  server.get("/mystories/:id", authenticate, usersStories);
 };
 
 function generateToken(user) {
