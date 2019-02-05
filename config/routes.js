@@ -56,7 +56,9 @@ function login(req, res) {
     .then(user => {
       if (user && bcrypt.compareSync(creds.password, user.password)) {
         const token = generateToken(user);
-        const response = {token, user}
+        const id = user.id;
+        const type = user.title;
+        const response = {token, id, type}
         res.status(200).send(response);
       } else {
         res.status(401).json({
