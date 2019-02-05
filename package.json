@@ -4,7 +4,8 @@
   "description": "Backend for remarkable story project",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "jest --watchAll --verbose"
   },
   "repository": {
     "type": "git",

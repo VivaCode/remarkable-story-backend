@@ -1,5 +1,9 @@
 const request = require("supertest");
 const server = require("./server");
+const db = require('../database/dbConfig')
+const configureRoutes = require('../config/routes')
+
+// configureRoutes(server)
 
 afterEach(async () => {
   await db("stories").truncate();
@@ -9,7 +13,7 @@ afterEach(async () => {
 describe("server.js tests", () => {
   describe("POST /REGISTER endpoint", () => {
     it("should respond with status code 201 OK", async () => {
-      let response = await request(server)
+      let response = await request(configureRoutes)
         .post("/api/register")
         .send({
           username: "austin",

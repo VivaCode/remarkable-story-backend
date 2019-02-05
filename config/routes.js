@@ -6,14 +6,14 @@ require("dotenv").config();
 const { authenticate } = require("../auth/authenticate");
 
 module.exports = server => {
-  server.post("/api/register", register);
-  server.post("/api/login", login);
-  server.get("/api/stories", getStories);
-  server.get("/api/stories/:id", getStory);
-  server.post("/api/stories", authenticate,  addStory);
-  server.delete("/api/stories/:id", authenticate, deleteStory);
-  server.put("/api/stories/:id", authenticate, editStory);
-  server.get("/mystories/:id", authenticate, usersStories);
+  server.post("/api/register", register),
+  server.post("/api/login", login),
+  server.get("/api/stories", getStories),
+  server.get("/api/stories/:id", getStory),
+  server.post("/api/stories", authenticate,  addStory),
+  server.delete("/api/stories/:id", authenticate, deleteStory),
+  server.put("/api/stories/:id", authenticate, editStory),
+  server.get("/mystories/:id", authenticate, usersStories)
 };
 
 function generateToken(user) {
@@ -56,7 +56,8 @@ function login(req, res) {
     .then(user => {
       if (user && bcrypt.compareSync(creds.password, user.password)) {
         const token = generateToken(user);
-        res.status(200).json({ message: `Welcome ${user.username}`, token });
+        const response = {token, user}
+        res.status(200).send(response);
       } else {
         res.status(401).json({
           message: "Login failed. Please enter correct username and password."
