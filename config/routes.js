@@ -9,6 +9,10 @@ module.exports = server => {
   server.post("/api/register", register);
   server.post("/api/login", login);
   server.get("/api/stories", getStories);
+  server.get("/api/stories/:id", getStory);
+  server.post("/api/stories", authenticate, addStory);
+  server.delete("/api/stories/:id", authenticate, deleteStory);
+  server.put("/api/stories/:id", authenticate, editStory);
 };
 
 function generateToken(user) {
@@ -44,24 +48,66 @@ function login(req, res) {
         const token = generateToken(user);
         res.status(200).json({ message: `Welcome ${user.username}`, token });
       } else {
-        res
-          .status(401)
-          .json({
-            message: "Login failed. Please enter correct username and password."
-          });
+        res.status(401).json({
+          message: "Login failed. Please enter correct username and password."
+        });
       }
     })
     .catch(() => res.status(500).send("Cannot reach server."));
 }
 
 function getStories(req, res) {
-//   const requestOptions = {
-//     headers: { accept: "application/json" }
-//   };
+  //   const requestOptions = {
+  //     headers: { accept: "application/json" }
+  //   };
 
   db("stories")
     .then(story => {
       res.status(200).json(story);
     })
     .catch(() => res.status(500).json({ message: "error fetching stories" }));
+}
+
+function getStory(req, res) {
+  db("stories")
+    .where({ id: req.params.id })
+    .then(story => {
+      res.status(200).json(story);
+    })
+    .catch(() => res.status(500).json({ message: "error fetching story" }));
+}
+
+function addStory(req, res) {
+  const story = req.body;
+
+  db("stories")
+    .insert(story)
+    .then(response => {
+      res.status(201).send(`Your story has been submitted`);
+    })
+    .catch(() =>
+      res.status(500).send({ error: "error saving story to database." })
+    );
+}
+
+function deleteStory(req, res) {
+  db("stories")
+    .where({ id: req.params.id })
+    .del()
+    .then(response => {
+      res.status(200).send(`The story has been deleted`);
+    })
+    .catch(() => res.status(500).send(`error deleting story from server`));
+}
+
+function editStory(req, res) {
+  const edit = req.body;
+
+  db("stories")
+    .where({ id: req.params.id })
+    .update(edit)
+    .then(response => {
+      res.status(201).send("Story has been edited");
+    })
+    .catch(() => res.status(500).send(`story couldn't be saved to database`));
 }
