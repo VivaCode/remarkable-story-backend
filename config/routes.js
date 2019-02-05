@@ -13,13 +13,14 @@ module.exports = server => {
   server.post("/api/stories", authenticate, addStory);
   server.delete("/api/stories/:id", authenticate, deleteStory);
   server.put("/api/stories/:id", authenticate, editStory);
+  server.get('/mystories/:id', authenticate, usersStories)
 };
 
 function generateToken(user) {
   const payload = { username: user.username };
   const secret = process.env.JWT_SECRET;
   const options = {
-    expiresIn: "10m"
+    expiresIn: "10h"
   };
   return jwt.sign(payload, secret, options);
 }
@@ -110,4 +111,13 @@ function editStory(req, res) {
       res.status(201).send("Story has been edited");
     })
     .catch(() => res.status(500).send(`story couldn't be saved to database`));
+}
+
+function usersStories(req, res) {
+    db('stories')
+    .where({ user_id: req.params.id })
+    .then(stories => {
+        res.status(200).send(stories)
+    })
+    .catch(() => res.status(500).send(`couldn't retrieve stories from database`))
 }
