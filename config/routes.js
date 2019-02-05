@@ -109,7 +109,10 @@ function deleteStory(req, res) {
     .where({ id: req.params.id })
     .del()
     .then(response => {
-      res.status(200).send(`The story has been deleted`);
+      db('stories')
+      .then(stories => {
+        res.status(201).send(stories);
+      })
     })
     .catch(() => res.status(500).send(`error deleting story from server`));
 }
@@ -121,7 +124,10 @@ function editStory(req, res) {
     .where({ id: req.params.id })
     .update(edit)
     .then(response => {
-      res.status(201).send("Story has been edited");
+      db('stories')
+      .then(stories => {
+        res.status(201).send(stories);
+      })
     })
     .catch(() => res.status(500).send(`story couldn't be saved to database`));
 }
