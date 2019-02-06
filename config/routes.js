@@ -14,6 +14,8 @@ module.exports = server => {
     server.delete("/api/stories/:id", authenticate, deleteStory),
     server.put("/api/stories/:id", authenticate, editStory),
     server.get("/mystories/:id", authenticate, usersStories);
+    server.get('/api/donations', getDonations);
+    server.post('/api/donations', addDonation);
 };
 
 function generateToken(user) {
@@ -67,7 +69,9 @@ function login(req, res) {
         const token = generateToken(user);
         const id = user.id;
         const type = user.title;
-        const response = { token, id, type };
+        const country = user.country;
+        const username = user.username
+        const response = { token, id, type, country, username };
         res.status(200).send(response);
       } else {
         res.status(401).json({
@@ -148,5 +152,28 @@ function usersStories(req, res) {
     })
     .catch(() =>
       res.status(500).send(`couldn't retrieve stories from database`)
+    );
+}
+
+function getDonations(req, res) {
+  db("donations")
+    .then(donations => {
+      res.status(200).send(donations);
+    })
+    .catch(() => res.status(500).json({ message: "error fetching donations" }));
+}
+
+function addDonation(req, res) {
+  const donation = req.body;
+
+  db("donations")
+    .insert(donation)
+    .then(response => {
+      db("donations").then(donations => {
+        res.status(201).send(donations);
+      });
+    })
+    .catch(() =>
+      res.status(500).send({ error: "error saving donation to database." })
     );
 }
