@@ -94,7 +94,7 @@ function getStory(req, res) {
   db("stories")
     .where({ id: req.params.id })
     .then(story => {
-      res.status(200).json(story);
+      res.status(200).send(story);
     })
     .catch(() => res.status(500).json({ message: "error fetching story" }));
 }
