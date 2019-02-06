@@ -7,13 +7,13 @@ const { authenticate } = require("../auth/authenticate");
 
 module.exports = server => {
   server.post("/api/register", register),
-  server.post("/api/login", login),
-  server.get("/api/stories", getStories),
-  server.get("/api/stories/:id", getStory),
-  server.post("/api/stories", authenticate,  addStory),
-  server.delete("/api/stories/:id", authenticate, deleteStory),
-  server.put("/api/stories/:id", authenticate, editStory),
-  server.get("/mystories/:id", authenticate, usersStories)
+    server.post("/api/login", login),
+    server.get("/api/stories", getStories),
+    server.get("/api/stories/:id", getStory),
+    server.post("/api/stories", addStory),
+    server.delete("/api/stories/:id", authenticate, deleteStory),
+    server.put("/api/stories/:id", authenticate, editStory),
+    server.get("/mystories/:id", authenticate, usersStories);
 };
 
 function generateToken(user) {
@@ -30,22 +30,31 @@ function register(req, res) {
   const hash = bcrypt.hashSync(userInfo.password, 14);
   userInfo.password = hash;
   if (
-    req.body.username == null ||
-    req.body.title == null ||
-    req.body.country === null ||
-    req.body.email === null ||
-    req.body.password === null
+    userInfo.username === null ||
+    userInfo.title === null ||
+    userInfo.country === null ||
+    userInfo.email === null ||
+    userInfo.password === null
   ) {
     res.status(422).send({ error: "information incomplete " });
-  } else {
+  } 
     db("users")
       .insert(userInfo)
-      .then(user => {
-        res.status(201).send(`Thank you for registering. Your ID is ${user}`);
+      .then(ids => {
+        db("users")
+          .where({ id: ids[0] })
+          .then(user => {
+            res
+              .status(201)
+              .send({ success: `Thank you for registering. Your ID is ${user}`});
+          })
+          .catch(() =>
+            res.status(405).send({ error: "information incomplete." })
+          );
       })
-      .catch(() => res.status(500).send(`error registering`));
+      .catch(() => res.status(405).send(`error registering`));
   }
-}
+
 
 function login(req, res) {
   const creds = req.body;
@@ -58,7 +67,7 @@ function login(req, res) {
         const token = generateToken(user);
         const id = user.id;
         const type = user.title;
-        const response = {token, id, type}
+        const response = { token, id, type };
         res.status(200).send(response);
       } else {
         res.status(401).json({
@@ -76,7 +85,7 @@ function getStories(req, res) {
 
   db("stories")
     .then(story => {
-      res.status(200).json(story);
+      res.status(200).json({story});
     })
     .catch(() => res.status(500).json({ message: "error fetching stories" }));
 }
@@ -96,10 +105,9 @@ function addStory(req, res) {
   db("stories")
     .insert(story)
     .then(response => {
-      db('stories')
-      .then(stories => {
+      db("stories").then(stories => {
         res.status(201).send(stories);
-      })
+      });
     })
     .catch(() =>
       res.status(500).send({ error: "error saving story to database." })
@@ -111,10 +119,9 @@ function deleteStory(req, res) {
     .where({ id: req.params.id })
     .del()
     .then(response => {
-      db('stories')
-      .then(stories => {
+      db("stories").then(stories => {
         res.status(201).send(stories);
-      })
+      });
     })
     .catch(() => res.status(500).send(`error deleting story from server`));
 }
@@ -126,10 +133,9 @@ function editStory(req, res) {
     .where({ id: req.params.id })
     .update(edit)
     .then(response => {
-      db('stories')
-      .then(stories => {
+      db("stories").then(stories => {
         res.status(201).send(stories);
-      })
+      });
     })
     .catch(() => res.status(500).send(`story couldn't be saved to database`));
 }
