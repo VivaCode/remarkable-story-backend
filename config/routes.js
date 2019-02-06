@@ -85,7 +85,7 @@ function getStories(req, res) {
 
   db("stories")
     .then(story => {
-      res.status(200).json({story});
+      res.status(200).send(story);
     })
     .catch(() => res.status(500).json({ message: "error fetching stories" }));
 }
