@@ -22,7 +22,7 @@ function generateToken(user) {
   const payload = { username: user.username };
   const secret = process.env.JWT_SECRET;
   const options = {
-    expiresIn: "10h"
+    expiresIn: "24h"
   };
   return jwt.sign(payload, secret, options);
 }
@@ -48,7 +48,7 @@ function register(req, res) {
           .then(user => {
             res
               .status(201)
-              .send({ success: `Thank you for registering. Your ID is ${user}`});
+              .send('succuess');
           })
           .catch(() =>
             res.status(405).send({ error: "information incomplete." })
